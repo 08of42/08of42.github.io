@@ -1,4 +1,4 @@
-function image(src){
+function image(src){// helper function since i can't `new Image(src)`
 	const img=new Image();
 	img.src=src;
 	return img;
@@ -19,32 +19,37 @@ const channels=[
 ];
 for(const{audio}of channels)if(audio)audio.loop=true;
 const noise={video:image("channels/white_noise.png"),audio:new Audio("channels/white_noise.ogg"),frame_time:1,};
+noise.audio.loop=true;
 
-const ctx=document.createElement("canvas").getContext("2d",{antialias:false});
-ctx.canvas.width=16;ctx.canvas.height=16;
-requestAnimationFrame(t=>document.body.appendChild(ctx.canvas));
+const ctx=document.createElement("canvas").getContext("2d");
+ctx.canvas.width=16;ctx.canvas.height=16;// scaled to fit current texture set, may change later if i want to add new channels
+requestAnimationFrame(t=>document.body.appendChild(ctx.canvas));// wait for the page to load then insert canvas
 
-let currentChannel=null,i=0,j=0;
+let currentChannel=null;
 requestAnimationFrame(function frame(t){
 	const{width,height}=ctx.canvas;
 	ctx.clearRect(0,0,width,height);
-	if(!currentChannel)return void requestAnimationFrame(frame);
-	const{video,audio,frame_time=1,interpolate=false}=currentChannel;
-	i=Math.floor(24*t/1000/frame_time)%(video.height/video.width);
+	if(!currentChannel)return void requestAnimationFrame(frame);// TV is "off", don't draw anything but keep the loop going
+	const{video,audio,frame_time=1,interpolate=false}=currentChannel;// get channel data
+	// TODO: interpolate frames
+	const i=Math.floor(24*t/1000/frame_time)%(video.height/video.width);// get current frame from time at `24/frame_time` fps
 	ctx.drawImage(video,	0,i*video.width,video.width,video.width,	0,0,width,height);
 	requestAnimationFrame(frame);
 });
 
 async function setChannel(id){
-	currentChannel?.audio?.pause();
+	currentChannel?.audio?.pause();// stop last channel
+	// turn off the TV
 	if(id===false){
 		currentChannel=null;
 		return;
 	}
+	// channel switch static for effect
 	currentChannel=noise;
 	noise.audio.play();
 	await new Promise(res=>setTimeout(res,250));
 	noise.audio.pause();
+	// actually play the selected channel
 	currentChannel=channels[id]??null;
 	currentChannel?.audio?.play();
 }
