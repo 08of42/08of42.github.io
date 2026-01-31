@@ -1,0 +1,4 @@
+Textures and audio from MrCrayfish's Furniture Mod:
+https://www.curseforge.com/minecraft/mc-mods/refurbished-furniture
+
+This page is just to see how hard it would be to recreate the in-game TV through Javascript
