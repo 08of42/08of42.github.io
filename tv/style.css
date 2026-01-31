@@ -12,3 +12,7 @@ canvas{
 	height:75vmin;
 	image-rendering:crisp-edges;
 }
+#channels{
+	width:min-content;
+	flex-direction:column;
+}
